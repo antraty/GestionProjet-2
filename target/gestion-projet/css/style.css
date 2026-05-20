@@ -1,0 +1,84 @@
+/* TaskMaster Pro Custom CSS */
+
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2c3e50;
+    --success-color: #2ecc71;
+    --danger-color: #e74c3c;
+    --warning-color: #f39c12;
+    --light-bg: #f8f9fa;
+}
+
+body {
+    background-color: #f4f6f8;
+}
+
+/* Kanban Board Styling */
+.kanban-board .card-header {
+    border-bottom: 2px solid #eef2f5 !important;
+}
+
+.task-card {
+    transition: all 0.2s ease-in-out;
+    border-radius: 8px;
+}
+
+.task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.task-card .badge {
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+/* Custom Scrollbar for columns */
+.kanban-board > div > .card > .card-body {
+    max-height: calc(100vh - 250px);
+    overflow-y: auto;
+}
+
+.kanban-board > div > .card > .card-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.kanban-board > div > .card > .card-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.kanban-board > div > .card > .card-body::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+/* UI refinements */
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+
+.dropdown-item {
+    padding: 8px 20px;
+    font-size: 14px;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.btn {
+    letter-spacing: 0.5px;
+}
+
+.modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}

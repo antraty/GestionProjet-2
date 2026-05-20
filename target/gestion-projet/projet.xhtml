@@ -1,0 +1,222 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets">
+
+    <f:metadata>
+        <f:viewAction action="#{tacheBean.chargerProjet}" />
+    </f:metadata>
+
+    <ui:define name="title">#{tacheBean.projet.nom} | TaskMaster Pro</ui:define>
+    <ui:define name="header">#{tacheBean.projet.nom}</ui:define>
+
+    <ui:define name="content">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <p class="text-muted lead">#{tacheBean.projet.description}</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <span class="badge bg-primary fs-6 py-2 px-3">#{tacheBean.projet.statut}</span>
+                <button type="button" class="btn btn-success ms-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#nouvelleTacheModal">
+                    <i class="fas fa-plus"></i> Ajouter une tâche
+                </button>
+            </div>
+        </div>
+
+        <!-- Kanban Board Style layout for tasks -->
+        <div class="row kanban-board">
+            <!-- Colonne "À faire" -->
+            <div class="col-lg-4 mb-4">
+                <div class="card bg-light shadow-none border-0 h-100">
+                    <div class="card-header bg-transparent border-0 pt-4 pb-2">
+                        <h6 class="text-uppercase fw-bold text-secondary mb-0">
+                            <i class="fas fa-circle text-danger me-2" style="font-size: 10px;"></i>À faire
+                        </h6>
+                    </div>
+                    <div class="card-body p-3">
+                        <ui:repeat value="#{tacheBean.taches}" var="tache">
+                            <h:panelGroup rendered="#{tache.statut eq 'À faire'}">
+                                <div class="card shadow-sm border-0 mb-3 task-card" style="border-left: 4px solid #e74c3c !important;">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-#{tache.priorite eq 'Haute' ? 'danger' : (tache.priorite eq 'Moyenne' ? 'warning text-dark' : 'info')}">#{tache.priorite}</span>
+                                            <h:form>
+                                                <div class="dropdown">
+                                                    <a href="#" class="text-muted" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-h"></i></a>
+                                                    <ul class="dropdown-menu">
+                                                        <li><h:commandLink action="#{tacheBean.mettreAJourStatut(tache, 'En cours')}" styleClass="dropdown-item"><i class="fas fa-play me-2"></i>Démarrer</h:commandLink></li>
+                                                        <li><hr class="dropdown-divider" /></li>
+                                                        <li><h:commandLink action="#{tacheBean.supprimerTache(tache.id)}" styleClass="dropdown-item text-danger" onclick="return confirm('Supprimer ?');"><i class="fas fa-trash me-2"></i>Supprimer</h:commandLink></li>
+                                                    </ul>
+                                                </div>
+                                            </h:form>
+                                        </div>
+                                        <h6 class="fw-bold mb-1">#{tache.titre}</h6>
+                                        <p class="text-muted small mb-2 text-truncate">#{tache.description}</p>
+                                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                            <small class="text-muted"><i class="far fa-calendar-alt me-1"></i>
+                                                <h:outputText value="#{tache.dateEcheance}">
+                                                    <f:convertDateTime pattern="dd MMM" />
+                                                </h:outputText>
+                                            </small>
+                                            <h:panelGroup rendered="#{not empty tache.assigneA}">
+                                                <img src="https://ui-avatars.com/api/?name=#{tache.assigneA.prenom}+#{tache.assigneA.nom}&amp;background=random&amp;color=fff&amp;size=24" class="rounded-circle shadow-sm" title="#{tache.assigneA.nomComplet}" alt="#{tache.assigneA.nomComplet}" />
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </ui:repeat>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonne "En cours" -->
+            <div class="col-lg-4 mb-4">
+                <div class="card bg-light shadow-none border-0 h-100">
+                    <div class="card-header bg-transparent border-0 pt-4 pb-2">
+                        <h6 class="text-uppercase fw-bold text-secondary mb-0">
+                            <i class="fas fa-circle text-warning me-2" style="font-size: 10px;"></i>En cours
+                        </h6>
+                    </div>
+                    <div class="card-body p-3">
+                        <ui:repeat value="#{tacheBean.taches}" var="tache">
+                            <h:panelGroup rendered="#{tache.statut eq 'En cours'}">
+                                <div class="card shadow-sm border-0 mb-3 task-card" style="border-left: 4px solid #f39c12 !important;">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-#{tache.priorite eq 'Haute' ? 'danger' : (tache.priorite eq 'Moyenne' ? 'warning text-dark' : 'info')}">#{tache.priorite}</span>
+                                            <h:form>
+                                                <div class="dropdown">
+                                                    <a href="#" class="text-muted" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-h"></i></a>
+                                                    <ul class="dropdown-menu">
+                                                        <li><h:commandLink action="#{tacheBean.mettreAJourStatut(tache, 'Terminé')}" styleClass="dropdown-item"><i class="fas fa-check me-2"></i>Terminer</h:commandLink></li>
+                                                        <li><h:commandLink action="#{tacheBean.mettreAJourStatut(tache, 'À faire')}" styleClass="dropdown-item"><i class="fas fa-undo me-2"></i>À faire</h:commandLink></li>
+                                                        <li><hr class="dropdown-divider" /></li>
+                                                        <li><h:commandLink action="#{tacheBean.supprimerTache(tache.id)}" styleClass="dropdown-item text-danger" onclick="return confirm('Supprimer ?');"><i class="fas fa-trash me-2"></i>Supprimer</h:commandLink></li>
+                                                    </ul>
+                                                </div>
+                                            </h:form>
+                                        </div>
+                                        <h6 class="fw-bold mb-1">#{tache.titre}</h6>
+                                        <p class="text-muted small mb-2 text-truncate">#{tache.description}</p>
+                                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                            <small class="text-muted"><i class="far fa-calendar-alt me-1"></i>
+                                                <h:outputText value="#{tache.dateEcheance}">
+                                                    <f:convertDateTime pattern="dd MMM" />
+                                                </h:outputText>
+                                            </small>
+                                            <h:panelGroup rendered="#{not empty tache.assigneA}">
+                                                <img src="https://ui-avatars.com/api/?name=#{tache.assigneA.prenom}+#{tache.assigneA.nom}&amp;background=random&amp;color=fff&amp;size=24" class="rounded-circle shadow-sm" title="#{tache.assigneA.nomComplet}" alt="#{tache.assigneA.nomComplet}" />
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </ui:repeat>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonne "Terminé" -->
+            <div class="col-lg-4 mb-4">
+                <div class="card bg-light shadow-none border-0 h-100">
+                    <div class="card-header bg-transparent border-0 pt-4 pb-2">
+                        <h6 class="text-uppercase fw-bold text-secondary mb-0">
+                            <i class="fas fa-circle text-success me-2" style="font-size: 10px;"></i>Terminé
+                        </h6>
+                    </div>
+                    <div class="card-body p-3">
+                        <ui:repeat value="#{tacheBean.taches}" var="tache">
+                            <h:panelGroup rendered="#{tache.statut eq 'Terminé'}">
+                                <div class="card shadow-sm border-0 mb-3 task-card" style="border-left: 4px solid #2ecc71 !important; opacity: 0.8;">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-secondary">#{tache.priorite}</span>
+                                            <h:form>
+                                                <div class="dropdown">
+                                                    <a href="#" class="text-muted" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-h"></i></a>
+                                                    <ul class="dropdown-menu">
+                                                        <li><h:commandLink action="#{tacheBean.mettreAJourStatut(tache, 'En cours')}" styleClass="dropdown-item"><i class="fas fa-undo me-2"></i>Ré-ouvrir</h:commandLink></li>
+                                                        <li><hr class="dropdown-divider" /></li>
+                                                        <li><h:commandLink action="#{tacheBean.supprimerTache(tache.id)}" styleClass="dropdown-item text-danger" onclick="return confirm('Supprimer ?');"><i class="fas fa-trash me-2"></i>Supprimer</h:commandLink></li>
+                                                    </ul>
+                                                </div>
+                                            </h:form>
+                                        </div>
+                                        <h6 class="fw-bold text-decoration-line-through text-muted mb-1">#{tache.titre}</h6>
+                                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                            <small class="text-muted"><i class="far fa-check-circle text-success me-1"></i> Fait</small>
+                                            <h:panelGroup rendered="#{not empty tache.assigneA}">
+                                                <img src="https://ui-avatars.com/api/?name=#{tache.assigneA.prenom}+#{tache.assigneA.nom}&amp;background=random&amp;color=fff&amp;size=24" class="rounded-circle shadow-sm" title="#{tache.assigneA.nomComplet}" alt="#{tache.assigneA.nomComplet}" />
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </ui:repeat>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Nouvelle Tâche -->
+        <div class="modal fade" id="nouvelleTacheModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <h:form id="formNouvelleTache">
+                        <div class="modal-header bg-light">
+                            <h5 class="modal-title fw-bold">Nouvelle tâche</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Passer l'ID du projet dans la requête -->
+                            <h:inputHidden value="#{tacheBean.projetId}" />
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Titre de la tâche *</label>
+                                <h:inputText value="#{tacheBean.nouvelleTache.titre}" styleClass="form-control" required="true" requiredMessage="Le titre est requis." />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Description</label>
+                                <h:inputTextarea value="#{tacheBean.nouvelleTache.description}" styleClass="form-control" rows="3" />
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold">Échéance</label>
+                                    <h:inputText value="#{tacheBean.nouvelleTache.dateEcheance}" styleClass="form-control">
+                                        <f:convertDateTime pattern="yyyy-MM-dd" />
+                                        <f:passThroughAttribute name="type" value="date" />
+                                    </h:inputText>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold">Priorité</label>
+                                    <h:selectOneMenu value="#{tacheBean.nouvelleTache.priorite}" styleClass="form-select">
+                                        <f:selectItem itemValue="Basse" itemLabel="Basse" />
+                                        <f:selectItem itemValue="Moyenne" itemLabel="Moyenne" />
+                                        <f:selectItem itemValue="Haute" itemLabel="Haute" />
+                                    </h:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Assigné à</label>
+                                <h:selectOneMenu value="#{tacheBean.utilisateurAssigneId}" styleClass="form-select">
+                                    <f:selectItem itemValue="#{null}" itemLabel="-- Non assigné --" />
+                                    <f:selectItems value="#{tacheBean.utilisateurs}" var="user" itemValue="#{user.id}" itemLabel="#{user.nomComplet}" />
+                                </h:selectOneMenu>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top-0">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <h:commandButton value="Créer" action="#{tacheBean.ajouterTache}" styleClass="btn btn-success">
+                                <f:param name="projetId" value="#{tacheBean.projetId}" />
+                            </h:commandButton>
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+
+    </ui:define>
+</ui:composition>

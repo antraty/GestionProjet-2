@@ -1,0 +1,115 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets">
+
+    <ui:define name="title">Projets | TaskMaster Pro</ui:define>
+    <ui:define name="header">Mes Projets</ui:define>
+
+    <ui:define name="content">
+        <div class="page-header">
+            <h2 class="h4 mb-0 text-gray-800">Vue d'ensemble des projets</h2>
+            <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#nouveauProjetModal">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Nouveau Projet
+            </button>
+        </div>
+
+        <!-- Cards View for Projects -->
+        <div class="row">
+            <ui:repeat value="#{projetBean.projets}" var="projet">
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card h-100 py-2 border-left-primary" style="border-left: 4px solid #3498db;">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1" style="color: #3498db !important;">
+                                        #{projet.statut}
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        <h:link outcome="projet" value="#{projet.nom}" style="text-decoration: none; color: #2c3e50;">
+                                            <f:param name="projetId" value="#{projet.id}" />
+                                        </h:link>
+                                    </div>
+                                    <p class="mt-2 text-muted small" style="min-height: 40px;">#{projet.description}</p>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <small class="text-muted"><i class="far fa-calendar-alt me-1"></i> 
+                                            <h:outputText value="#{projet.dateDebut}">
+                                                <f:convertDateTime pattern="dd MMM yyyy" />
+                                            </h:outputText>
+                                        </small>
+                                        <h:form>
+                                            <h:commandLink action="#{projetBean.supprimerProjet(projet.id)}" styleClass="text-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce projet ?');">
+                                                <i class="fas fa-trash"></i>
+                                            </h:commandLink>
+                                        </h:form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ui:repeat>
+            <h:panelGroup rendered="#{empty projetBean.projets}">
+                <div class="col-12 text-center py-5">
+                    <img src="https://illustrations.popsy.co/amber/freelancer.svg" alt="No projects" style="height: 200px; margin-bottom: 20px;" />
+                    <h4 class="text-muted">Aucun projet pour le moment.</h4>
+                    <p class="text-muted">Créez votre premier projet pour commencer à collaborer.</p>
+                </div>
+            </h:panelGroup>
+        </div>
+
+        <!-- Modal for New Project -->
+        <div class="modal fade" id="nouveauProjetModal" tabindex="-1" aria-labelledby="nouveauProjetModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <h:form id="formNouveauProjet">
+                        <div class="modal-header bg-light">
+                            <h5 class="modal-title fw-bold" id="nouveauProjetModalLabel">Créer un nouveau projet</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Nom du projet *</label>
+                                <h:inputText value="#{projetBean.nouveauProjet.nom}" styleClass="form-control" required="true" requiredMessage="Le nom est obligatoire." />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Description</label>
+                                <h:inputTextarea value="#{projetBean.nouveauProjet.description}" styleClass="form-control" rows="3" />
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold">Date de début</label>
+                                    <h:inputText value="#{projetBean.nouveauProjet.dateDebut}" styleClass="form-control">
+                                        <f:convertDateTime pattern="yyyy-MM-dd" />
+                                        <f:passThroughAttribute name="type" value="date" />
+                                    </h:inputText>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold">Date de fin prévue</label>
+                                    <h:inputText value="#{projetBean.nouveauProjet.dateFin}" styleClass="form-control">
+                                        <f:convertDateTime pattern="yyyy-MM-dd" />
+                                        <f:passThroughAttribute name="type" value="date" />
+                                    </h:inputText>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Statut</label>
+                                <h:selectOneMenu value="#{projetBean.nouveauProjet.statut}" styleClass="form-select">
+                                    <f:selectItem itemValue="En cours" itemLabel="En cours" />
+                                    <f:selectItem itemValue="En attente" itemLabel="En attente" />
+                                    <f:selectItem itemValue="Terminé" itemLabel="Terminé" />
+                                </h:selectOneMenu>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top-0">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <h:commandButton value="Créer le projet" action="#{projetBean.ajouterProjet}" styleClass="btn btn-primary" />
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
